@@ -24,23 +24,17 @@ public:
 
     // Function to generate phone numbers and store them in the vectors
     void generateNumbers() {
-        // Setup random number generators
-        std::random_device rd;                  // Random device for seeding
-        std::mt19937 gen(rd());                 // Mersenne Twister engine for randomness
-        std::uniform_int_distribution<unsigned long long> countryCodeDist(1, 999); // Country code range: 1-999
-        std::uniform_int_distribution<unsigned long long> numberDist(1000000000, 9999999999ULL); // 10-digit number
+        // Setup random number generator
+        srand(time(0)); 
 
         // Loop to generate the required number of phone numbers
         for (int i = 0; i < numPhoneNumbers; ++i) {
-            unsigned long long countryCode = countryCodeDist(gen); // Generate a random country code
-            unsigned long long number = numberDist(gen);           // Generate a random 10-digit number
+            unsigned long long number = 100000000000ULL + (rand() % 900000000000ULL); // Generate a random 12-digit number
 
-            // Create binary representation by combining country code and number
-            unsigned long long binary = (countryCode * 10000000000ULL) + number;
-            binaryPhoneNumbers.push_back(binary); // Store in the binary vector
+            binaryPhoneNumbers.push_back(number);
 
             // Create string representation in the format: XXX-XXX-XXX-XXXX
-            std::string asString = std::to_string(countryCode) + "-" +
+            std::string asString = std::to_string(number / 10000000000) + "-" +
                                    std::to_string(number / 10000000) + "-" +
                                    std::to_string((number / 10000) % 1000) + "-" +
                                    std::to_string(number % 10000);
