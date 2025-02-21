@@ -4,6 +4,10 @@
 #include <string>        // To store phone numbers as strings
 #include <chrono>        // To measure execution time
 #include <fstream>       // For file output
+#include <ctime>    // for time()
+#include <cstdlib> // for srand(), rand()
+#include <utility>
+
 
 
 
@@ -116,6 +120,65 @@ public:
 
 
 
+// -----------------------------------------
+// Filter by Prefix
+// -----------------------------------------
+
+class PrefixFilter {
+    public:
+        // Filter binary numbers by prefix without converting to string
+        static std::pair<double, std::size_t> filterBinary(const std::vector<unsigned long long>& binaryNumbers) {
+            std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now(); // Start timer
+
+    
+            std::vector<unsigned long long> filteredNumbers;
+            for (std::size_t i = 0; i < binaryNumbers.size(); ++i) {
+                unsigned long long number = binaryNumbers[i];
+                // Extract the first 2 digits by dividing by 10^(12 - 2) = 10^10
+                unsigned long long prefix = number / 10000000000ULL;
+    
+                // Check if the prefix is in the desired set
+                if (prefix == 13 || prefix == 31 || prefix == 23 || 
+                    prefix == 29 || prefix == 30 || prefix == 18 || prefix == 17) {
+                    filteredNumbers.push_back(number);
+                }
+            }
+    
+            std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now(); // End timer
+            std::chrono::duration<double> duration = end - start;
+            return std::make_pair(duration.count(), filteredNumbers.size()); // Return time & size
+        }
+    
+        // Filter string numbers by prefix
+        static std::pair<double, std::size_t> filterStrings(const std::vector<std::string>& stringNumbers) {
+            std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now(); // Start timer
+
+    
+            std::vector<std::string> filteredNumbers;
+            for (std::size_t i = 0; i < stringNumbers.size(); ++i) {
+                std::string number = stringNumbers[i];
+                // Get the prefix (first 2 characters)
+                std::string prefix = number.substr(0, 2);
+    
+                // Check if the prefix is in the desired set
+                if (prefix == "13" || prefix == "31" || prefix == "23" || 
+                    prefix == "29" || prefix == "30" || prefix == "18" || prefix == "17") {
+                    filteredNumbers.push_back(number);
+                }
+            }
+    
+            std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now(); // End timer
+    std::chrono::duration<double> duration = end - start;
+            return std::make_pair(duration.count(), filteredNumbers.size()); // Return time & size
+        }
+    };
+    
+    
+    
+
+
+
+
 // -------------------------------------------
 // Main function 
 // -------------------------------------------
@@ -136,9 +199,27 @@ int main() {
     // Dump the phone NRs as strings & measure time 
     double stringDuration = FileDumper::dumpStrings(generator.getStringNumbers(), "phone_numbers_string.txt");
 
-    // Display time it took
+    // Display time it took for dump
     std::cout << "Binary dump took: " << binaryDuration << " seconds.\n";
     std::cout << "String dump took: " << stringDuration << " seconds.\n";
+
+
+    // Filter by prefix for binary & measure time 
+    // auto [binaryFilterDuration, binaryMatches] = PrefixFilter::filterBinary(generator.getBinaryNumbers());
+    std::pair<double, std::size_t> binaryResult = PrefixFilter::filterBinary(generator.getBinaryNumbers());
+double binaryFilterDuration = binaryResult.first;
+std::size_t binaryMatches = binaryResult.second;
+
+
+    // Filter by prefix for string & measure time 
+   // auto [stringFilterDuration, stringsMatches] = PrefixFilter::filterStrings(generator.getStringNumbers());
+   std::pair<double, std::size_t> stringResult = PrefixFilter::filterStrings(generator.getStringNumbers());
+double stringFilterDuration = stringResult.first;
+std::size_t stringsMatches = stringResult.second;
+
+    // Display time and nrs for filtering
+    std::cout << "Binary prefix filter took: " << binaryFilterDuration << " seconds and detected: " << binaryMatches << " matches \n";
+    std::cout << "String prefix filter took: " << stringFilterDuration << " seconds and detected: " << stringsMatches << " matches \n";
 
     return 0;
 }
