@@ -7,6 +7,7 @@
 #include <ctime>    // for time()
 #include <cstdlib> // for srand(), rand()
 #include <utility>
+#include <random> 
 
 
 
@@ -40,7 +41,16 @@ public:
 
         // Generate correct nr. of phone numbers
         for (int i = 0; i < numPhoneNumbers; ++i) {
-            unsigned long long number = 100000000000ULL + (rand() % 900000000000ULL); // Generate a random 12-digit number
+
+        // Generate a random 12-digit number
+            // Combine two rand() calls into a 62-bit random value
+            unsigned long long hi = static_cast<unsigned long long>(rand()) << 31;
+            unsigned long long lo = static_cast<unsigned long long>(rand());
+            unsigned long long bigRand = hi ^ lo;  // Combine them
+
+        // map random nr into a 12-digit number
+        unsigned long long number = 100000000000ULL + (bigRand % 900000000000ULL);
+
             
             // Store binary numbers
             binaryPhoneNumbers.push_back(number);
@@ -126,7 +136,7 @@ public:
 
 class PrefixFilter {
     public:
-        // Filter binary numbers by prefix without converting to string
+        // Filter binary numbers by prefix 
         static std::pair<double, std::size_t> filterBinary(const std::vector<unsigned long long>& binaryNumbers) {
             std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now(); // Start timer
 
@@ -134,7 +144,7 @@ class PrefixFilter {
             std::vector<unsigned long long> filteredNumbers;
             for (std::size_t i = 0; i < binaryNumbers.size(); ++i) {
                 unsigned long long number = binaryNumbers[i];
-                // Extract the first 2 digits by dividing by 10^(12 - 2) = 10^10
+                // Calculating the first 2 digits 
                 unsigned long long prefix = number / 10000000000ULL;
     
                 // Check if the prefix is in the desired set
