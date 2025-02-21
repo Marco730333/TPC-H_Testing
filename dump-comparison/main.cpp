@@ -5,117 +5,138 @@
 #include <chrono>        // To measure execution time
 #include <fstream>       // For file output
 
-// -------------------------------------------------
-// Class to generate phone numbers in both binary and string formats
-// -------------------------------------------------
+
+
+
+
+
+// -------------------------------------------
+// generate phone numbers in binary & strings
+// -------------------------------------------
+
+
 class PhoneNumberGenerator {
 private:
-    std::vector<unsigned long long> binaryPhoneNumbers; // Vector to store binary representations
-    std::vector<std::string> stringPhoneNumbers;         // Vector to store string representations
-    int numPhoneNumbers;                                // Number of phone numbers to generate
+    std::vector<unsigned long long> binaryPhoneNumbers; // Vector to store binary 
+    std::vector<std::string> stringPhoneNumbers;         // Vector to store strings
+    int numPhoneNumbers;                                // quantity of numbrs
 
 public:
-    // Constructor to initialize the number of phone numbers to generate
+    // Constructor 
     PhoneNumberGenerator(int count) : numPhoneNumbers(count) {
-        // Reserve memory for the vectors for better performance
+        // Reserve memory for the vectors
         binaryPhoneNumbers.reserve(numPhoneNumbers);
         stringPhoneNumbers.reserve(numPhoneNumbers);
     }
 
-    // Function to generate phone numbers and store them in the vectors
+    // Generate NRs and store them in the vectors
     void generateNumbers() {
-        // Setup random number generator
+        // Random Nr. generator based on the current time
         srand(time(0)); 
 
-        // Loop to generate the required number of phone numbers
+        // Generate correct nr. of phone numbers
         for (int i = 0; i < numPhoneNumbers; ++i) {
             unsigned long long number = 100000000000ULL + (rand() % 900000000000ULL); // Generate a random 12-digit number
-
+            
+            // Store binary numbers
             binaryPhoneNumbers.push_back(number);
 
-            // Create string representation in the format: XXX-XXX-XXX-XXXX
+            // convert to the string format
             std::string asString = std::to_string(number / 10000000000) + "-" +
                                    std::to_string(number / 10000000) + "-" +
                                    std::to_string((number / 10000) % 1000) + "-" +
                                    std::to_string(number % 10000);
-            stringPhoneNumbers.push_back(asString); // Store in the string vector
+            stringPhoneNumbers.push_back(asString); // Store string numbers
         }
     }
 
-    // Getter to retrieve the vector of binary phone numbers
+    // Getter for binary
     const std::vector<unsigned long long>& getBinaryNumbers() const {
         return binaryPhoneNumbers;
     }
 
-    // Getter to retrieve the vector of string phone numbers
+    // Getter for strings
     const std::vector<std::string>& getStringNumbers() const {
         return stringPhoneNumbers;
     }
 };
 
-// -------------------------------------------------
-// Class to handle file output and measure execution time
-// -------------------------------------------------
+
+
+
+
+
+// -----------------------------------------
+// dump vectors & measure time for each
+// -----------------------------------------
+
+
 class FileDumper {
 public:
-    // Function to dump binary phone numbers to a file and measure the time taken
+    // dump binary phone numbers
     static double dumpBinary(const std::vector<unsigned long long>& binaryNumbers, const std::string& filename) {
         auto start = std::chrono::high_resolution_clock::now(); // Start timer
 
-        // Open a file in binary mode
+        // create binary file
         std::ofstream binaryFile(filename, std::ios::binary);
 
-        // Write each phone number's binary representation to the file
+        // Write phone numbers to file
         for (size_t i = 0; i < binaryNumbers.size(); ++i) {
             binaryFile.write(reinterpret_cast<const char*>(&binaryNumbers[i]), sizeof(binaryNumbers[i]));
         }
 
-        binaryFile.close(); // Close the file
+        binaryFile.close(); // Close file
 
         auto end = std::chrono::high_resolution_clock::now(); // End timer
         std::chrono::duration<double> duration = end - start; // Calculate duration
-        return duration.count(); // Return the time taken in seconds
+        return duration.count(); // Return time
     }
 
-    // Function to dump string phone numbers to a file and measure the time taken
+    // Dump string phone numbers
     static double dumpStrings(const std::vector<std::string>& stringNumbers, const std::string& filename) {
         auto start = std::chrono::high_resolution_clock::now(); // Start timer
 
-        // Open a text file for string output
+        // create string file
         std::ofstream stringFile(filename);
 
-        // Write each phone number's string representation to the file
+        // Write phone numbers to file
         for (size_t i = 0; i < stringNumbers.size(); ++i) {
             stringFile << stringNumbers[i] << "\n";
         }
 
-        stringFile.close(); // Close the file
+        stringFile.close(); // Close file
 
         auto end = std::chrono::high_resolution_clock::now(); // End timer
         std::chrono::duration<double> duration = end - start; // Calculate duration
-        return duration.count(); // Return the time taken in seconds
+        return duration.count(); // Return time 
     }
 };
 
-// -------------------------------------------------
-// Main function to control the flow of the program
-// -------------------------------------------------
+
+
+
+
+// -------------------------------------------
+// Main function 
+// -------------------------------------------
+
+
 int main() {
-    const int numPhoneNumbers = 1000000; // Number of phone numbers to generate
+    const int numPhoneNumbers = 1000000; // Nr. of phone numbers to generate
 
     // Create an instance of PhoneNumberGenerator
     PhoneNumberGenerator generator(numPhoneNumbers);
 
-    // Generate the phone numbers
+    // Generate phone NRs
     generator.generateNumbers();
 
-    // Dump the phone numbers in binary format and measure the time taken
+    // Dump the phone NRs in binary & measure time 
     double binaryDuration = FileDumper::dumpBinary(generator.getBinaryNumbers(), "phone_numbers_binary.txt");
 
-    // Dump the phone numbers as strings and measure the time taken
+    // Dump the phone NRs as strings & measure time 
     double stringDuration = FileDumper::dumpStrings(generator.getStringNumbers(), "phone_numbers_string.txt");
 
-    // Display the time taken for each file dump
+    // Display time it took
     std::cout << "Binary dump took: " << binaryDuration << " seconds.\n";
     std::cout << "String dump took: " << stringDuration << " seconds.\n";
 
